@@ -5,8 +5,7 @@ import config from '../config/index'
 import jwt from 'jsonwebtoken'
 
 const getJWTpayload = token => {
-    console.log(token);
-
+    // console.log(token);
     return jwt.verify(token.split(' ')[1], config.JWT_SECRET)
 }
 

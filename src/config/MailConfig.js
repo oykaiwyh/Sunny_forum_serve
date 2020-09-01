@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer"
-
+import config from "./index";
+import qs from 'qs'
 // async..await is not allowed in global scope, must use a wrapper
 async function SendEmail(sendInfo) {
     console.log(sendInfo);
@@ -29,13 +30,15 @@ async function SendEmail(sendInfo) {
     //     user: 'Sunnny',
     //     expire: '2019-08-15'
     // }
-    let url = 'http://www.baidu.com'
+    const baseUrl = config.baseUrl
+    const route = sendInfo.type === 'email' ? '/email' : '/reset'
+    let url = `${baseUrl}/#${route}?` + qs.stringify(sendInfo.data)
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
         from: '"认证邮件Fred Foo 👻" <1641250803@qq.com>', // sender address
         to: sendInfo.email, // list of receivers
-        subject: sendInfo.user !== '' ? `您好，您正在注册Sunny社区,请及时注册` : '', // Subject line
+        subject: sendInfo.user !== '' && sendInfo.type !== 'email' ? `${ sendInfo.user}您好，您正在注册Sunny社区,请及时注册` : '您好，您正在修改Sunny社区注册邮箱,请及谨慎', // Subject line
         text: `您在Sunny验证码为${sendInfo.code}，过期时间${sendInfo.expire}`, // plain text body
         html: `
         <div style="border: 1px solid #dcdcdc;color: #676767;width: 600px; margin: 0 auto; padding-bottom: 50px;position: relative;">

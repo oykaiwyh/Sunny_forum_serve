@@ -40,6 +40,12 @@ npm install -S bcrypt
 <!--  dayjs  -->
 npm install -S dayjs
 
+<!-- 随机签名 -->
+npm install -s uuid
+
+<!-- 文件上传 -->
+npm install -s make-dir
+
 
 
 

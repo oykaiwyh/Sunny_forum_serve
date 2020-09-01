@@ -4,6 +4,15 @@ import {
 } from '../common/utils'
 import User from '../model/user'
 import moment from 'dayjs'
+import {
+    SendEmail
+} from '../config/MailConfig'
+import uuid from 'uuid/dist/v4'
+import jwt from 'jsonwebtoken'
+import config from '@/config';
+import {
+    getValue
+} from '@/config/RedisConfig'
 
 class UserController {
     //用户签到接口
@@ -124,6 +133,82 @@ class UserController {
             msg: '签到请求成功',
             ...result,
             lastSign: newRecord.created
+        }
+    }
+
+    //更新用户基本信息接口
+    async updateUserInfo(ctx) {
+        const {
+            body
+        } = ctx.request
+        const obj = await getJWTpayload(ctx.header.authorization)
+        //判断用户是否修改了邮箱
+        const user = await User.findOne({
+            _id: obj._id
+        })
+        if (body.username && body.username !== user.username) {
+            //用户修改了邮箱
+            const key = uuid
+            let token = jsonwebtoken.sign({
+                _id: obj._id,
+            }, config.JWT_SECRET, {
+                expiresIn: '30m' //1天
+            })
+            const result = await SendEmail({
+                type: 'email',
+                token: token,
+                user: user.name,
+                code: '',
+                email: user.username,
+                expire: moment().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
+                data: {
+                    key: key,
+                    username: body.username
+                }
+            })
+
+            ctx.body = {
+                code: 200,
+                msg: '已成功发送验证邮箱，请点击链接确认修改邮箱账号'
+            }
+
+        } else {
+            const ellipsis_data = ['username', 'mobile', 'password']
+            ellipsis_data.map(item => {
+                delete body[item]
+            })
+            const result = await User.updateOne({
+                _id: obj._id
+            }, body)
+            if (result.n === 1 && result.ok === 1) {
+                ctx.body = {
+                    code: 200,
+                    msg: '用户信息更新成功'
+                }
+            } else {
+                ctx.body = {
+                    code: 500,
+                    msg: '用户信息更新失败'
+                }
+            }
+        }
+    }
+
+    //更新用户名
+    async updateUsername(ctx) {
+        const body = ctx.query
+        if (body.key) {
+            const token = getValue(key)
+            const obj = getJWTpayload('Bearer ', token)
+            await User.updateOne({
+                _id: obj._id
+            }, {
+                username: body.username
+            })
+            ctx.body = {
+                code: 200,
+                msg: '更新用户名成功'
+            }
         }
     }
 }

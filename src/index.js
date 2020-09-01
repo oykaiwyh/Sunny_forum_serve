@@ -21,7 +21,7 @@ const isDevMode = process.env.NODE_ENV === 'production' ? false : true
 const jwt = Jwt({
     secret: config.JWT_SECRET
 }).unless({
-    path: [/^\/public/, /^\/login/, /^\/getCaptcha/, /^\/register/]
+    path: [/^\/public/, /^\/login/]
 })
 
 /**
