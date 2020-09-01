@@ -1,0 +1,17 @@
+/*
+ * https://code.visualstudio.com/docs/languages/jsconfig
+ * 插件 Node modules resolve
+ * 关于vscode aliase支持的配置
+ */
+
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "allowSyntheticDefaultImports": false,
+        "baseUrl": "./",
+        "paths": {
+            "@/*": ["src/*"]
+        }
+    },
+    "exclude": ["node_modules", "dist"]
+}
