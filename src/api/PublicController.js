@@ -17,8 +17,6 @@ class PublicController {
     constructor() {}
     async getCaptcha(ctx) {
         const body = ctx.request.query
-        console.log(body);
-
         var captcha = svgCaptcha.create({
             size: 4,
             ignoreChars: 'o0li1', //过滤出现o0这样的干扰

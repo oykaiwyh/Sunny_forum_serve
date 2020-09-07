@@ -28,7 +28,18 @@ const jwt = Jwt({
  * 使用koa-compose 集成中间件
  */
 const middleware = compose([
-    koaBody(),
+    koaBody({
+        multipart: true,
+        // encoding: "utf-8",
+        formidable: {
+            keepExtensions: true,
+            maxFieldsSize: 5 * 1024 * 1024
+        },
+        patchKoa: true,
+        onError: err => {
+            console.log('koabody TCL: err', err)
+        }
+    }),
     statics(path.join(__dirname, '../public')),
     cors(),
     jsonutil({

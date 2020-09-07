@@ -11,8 +11,10 @@ import uuid from 'uuid/dist/v4'
 import jwt from 'jsonwebtoken'
 import config from '@/config';
 import {
-    getValue
+    getValue,
+    setValue
 } from '@/config/RedisConfig'
+import bcrypt from 'bcrypt' //版本要求较高
 
 class UserController {
     //用户签到接口
@@ -141,6 +143,7 @@ class UserController {
         const {
             body
         } = ctx.request
+        let msg = ''
         const obj = await getJWTpayload(ctx.header.authorization)
         //判断用户是否修改了邮箱
         const user = await User.findOne({
@@ -148,15 +151,31 @@ class UserController {
         })
         if (body.username && body.username !== user.username) {
             //用户修改了邮箱
-            const key = uuid
-            let token = jsonwebtoken.sign({
-                _id: obj._id,
-            }, config.JWT_SECRET, {
-                expiresIn: '30m' //1天
+            // 发送reset邮件
+            //判断用户得新邮箱是否已经有人注册
+
+            const OwnUser = await User.findOne({
+                username: body.username
             })
+            if (OwnUser && OwnUser.password) {
+                ctx.body = {
+                    code: 501,
+                    msg: "邮箱已经注册"
+                }
+                return
+            }
+
+            const key = uuid()
+            setValue(
+                key,
+                jwt.sign({
+                    _id: obj._id
+                }, config.JWT_SECRET, {
+                    expiresIn: '30m'
+                })
+            )
             const result = await SendEmail({
                 type: 'email',
-                token: token,
                 user: user.name,
                 code: '',
                 email: user.username,
@@ -167,29 +186,30 @@ class UserController {
                 }
             })
 
+            // ctx.body = {
+            //     code: 200,
+            //     msg: '已成功发送验证邮箱，请点击链接确认修改邮箱账号'
+            // }
+            msg = '更新基本资料成功，账号修改需要邮件验证，已成功发送验证邮箱，请查收'
+
+        }
+        //修改了其它信息
+        const ellipsis_data = ['username', 'mobile', 'password']
+        ellipsis_data.map(item => {
+            delete body[item]
+        })
+        const result = await User.updateOne({
+            _id: obj._id
+        }, body)
+        if (result.n === 1 && result.ok === 1) {
             ctx.body = {
                 code: 200,
-                msg: '已成功发送验证邮箱，请点击链接确认修改邮箱账号'
+                msg: msg === '' ? '用户信息更新成功' : msg
             }
-
         } else {
-            const ellipsis_data = ['username', 'mobile', 'password']
-            ellipsis_data.map(item => {
-                delete body[item]
-            })
-            const result = await User.updateOne({
-                _id: obj._id
-            }, body)
-            if (result.n === 1 && result.ok === 1) {
-                ctx.body = {
-                    code: 200,
-                    msg: '用户信息更新成功'
-                }
-            } else {
-                ctx.body = {
-                    code: 500,
-                    msg: '用户信息更新失败'
-                }
+            ctx.body = {
+                code: 500,
+                msg: '用户信息更新失败'
             }
         }
     }
@@ -198,8 +218,9 @@ class UserController {
     async updateUsername(ctx) {
         const body = ctx.query
         if (body.key) {
-            const token = getValue(key)
-            const obj = getJWTpayload('Bearer ', token)
+            const token = await getValue(body.key)
+            const obj = getJWTpayload('Bearer ' + token)
+
             await User.updateOne({
                 _id: obj._id
             }, {
@@ -211,6 +232,40 @@ class UserController {
             }
         }
     }
+
+    async changePasswd(ctx) {
+        const {
+            body
+        } = ctx.request
+        const obj = await getJWTpayload(ctx.header.authorization)
+        const user = await User.findOne({
+            _id: obj._id
+        })
+        // 密码比较比较 前面是未加密的值 ， 后面是加密的hash
+        if (await bcrypt.compare(body.oldpwd, user.password)) {
+            const newpasswd = await bcrypt.hash(body.newpwd, 5)
+            const result = await User.updateOne({
+                _id: obj._id
+            }, {
+                $set: {
+                    password: newpasswd
+                }
+            })
+            ctx.body = {
+                code: 200,
+                msg: '更新密码成功'
+            }
+        } else {
+            ctx.body = {
+                code: 500,
+                msg: '更新密码错误，请检查当前密码是否输入正确？'
+            }
+        }
+
+
+
+    }
+
 }
 
 export default new UserController()

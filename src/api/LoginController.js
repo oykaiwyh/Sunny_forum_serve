@@ -15,7 +15,7 @@ import SignRecord from '@/model/SignRecord';
 class LoginController {
     constructor() {}
 
-    async reset(ctx) {
+    async forget(ctx) {
         const {
             body
         } = ctx.request;

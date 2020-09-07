@@ -31,7 +31,7 @@ async function SendEmail(sendInfo) {
     //     expire: '2019-08-15'
     // }
     const baseUrl = config.baseUrl
-    const route = sendInfo.type === 'email' ? '/email' : '/reset'
+    const route = sendInfo.type === 'email' ? '/confirm' : '/reset'
     let url = `${baseUrl}/#${route}?` + qs.stringify(sendInfo.data)
 
     // send mail with defined transport object
