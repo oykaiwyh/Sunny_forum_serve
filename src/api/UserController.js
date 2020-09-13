@@ -15,6 +15,7 @@ import {
     setValue
 } from '@/config/RedisConfig'
 import bcrypt from 'bcrypt' //版本要求较高
+import UserCollect from '@/model/UserCollect'
 
 class UserController {
     //用户签到接口
@@ -233,6 +234,7 @@ class UserController {
         }
     }
 
+    // 修改密码
     async changePasswd(ctx) {
         const {
             body
@@ -265,6 +267,94 @@ class UserController {
 
 
     }
+
+    // 设置 / 取消收藏 
+    async setCollect(ctx) {
+        const params = ctx.query
+        const obj = await getJWTpayload(ctx.header.authorization)
+
+        if (parseInt(params.isFav)) {
+            // 说明用户已经收藏了贴子
+            await UserCollect.deleteOne({
+                uid: obj._id,
+                tid: params.tid
+            })
+            ctx.body = {
+                code: 200,
+                msg: '取消收藏成功'
+            }
+        } else {
+            const newCollect = new UserCollect({
+                uid: obj._id,
+                tid: params.tid,
+                title: params.title
+            })
+
+            const result = await newCollect.save()
+            if (result.uid) {
+                ctx.body = {
+                    code: 200,
+                    data: result,
+                    msg: '设置收藏成功'
+                }
+            }
+        }
+
+    }
+
+    // 获取收藏列表
+    async getCollectByUid(ctx) {
+        const params = ctx.query
+        const obj = await getJWTpayload(ctx.header.authorization)
+        const result = await UserCollect.getListByUid(
+            obj._id,
+            params.page,
+            params.limit ? parseInt(params.limit) : 10
+        )
+        const total = await UserCollect.countByUid(obj._id)
+        if (result.length > 0) {
+            ctx.body = {
+                code: 200,
+                data: result,
+                total,
+                msg: '查询列表成功'
+            }
+        } else {
+            ctx.body = {
+                code: 500,
+                msg: '无收藏贴子'
+            }
+        }
+    }
+
+    // 获取用户的基本信息
+    async getBasicInfo(ctx) {
+        const params = ctx.query
+        // const obj = await getJWTPayload(ctx.header.authorization)
+        const uid = params.uid || ctx._id
+        let user = await User.findByID(uid)
+        // 取得用户的签到记录 有没有 > today 0:00:00
+        user = user.toJSON()
+        const date = moment().format('YYYY-MM-DD')
+        const result = await SignRecord.findOne({
+            uid: uid,
+            created: {
+                $gte: date + ' 00:00:00'
+            }
+        })
+        if (result && result.uid) {
+            user.isSign = true
+        } else {
+            user.isSign = false
+        }
+        ctx.body = {
+            code: 200,
+            data: user,
+            msg: '查询成功！'
+        }
+    }
+
+
 
 }
 

@@ -75,10 +75,20 @@ const mkdir = async (dir) => {
 }
 
 
+// 文章详情字段替换
+const rename = (obj, key, newkey) => {
+    if (Object.keys(obj).indexOf(key) !== -1) {
+        obj[newkey] = obj[key]
+        delete obj[key]
+    }
+    return obj
+}
+
 
 
 export {
     checkCode,
     getJWTpayload,
-    dirExists
+    dirExists,
+    rename
 }
