@@ -16,6 +16,7 @@ import {
 } from '@/config/RedisConfig'
 import bcrypt from 'bcrypt' //版本要求较高
 import UserCollect from '@/model/UserCollect'
+import Comments from '@/model/Comments'
 
 class UserController {
     //用户签到接口
@@ -353,6 +354,60 @@ class UserController {
             msg: '查询成功！'
         }
     }
+
+    // 获取用户的历史消息
+    // 记录评论之后，给作者发送消息
+    async getMsg(ctx) {
+        const params = ctx.query
+        const page = params.page ? params.page : 0
+        const limit = params.limit ? parseInt(params.limit) : 0
+        // 方法一： 嵌套查询 -> aggregate 12-4-2
+        // 方法二： 通过冗余换时间
+        const obj = await getJWTpayload(ctx.header.authorization)
+
+        const num = await Comments.getTotal(obj._id)
+        const result = await Comments.getMsgList(obj._id, page, limit)
+        // console.log(result);
+
+        ctx.body = {
+            code: 200,
+            data: result,
+            total: num
+        }
+
+    }
+
+    // 设置已读消息
+    async setMsg(ctx) {
+        const params = ctx.query
+        if (params.id) { // 指定消息
+            const result = await Comments.updateOne({
+                _id: params.id
+            }, {
+                isRead: '1'
+            })
+            if (result.ok === 1) {
+                ctx.body = {
+                    code: 200,
+                }
+            }
+        } else { // 所有消息
+            const obj = await getJWTpayload(ctx.header.authorization)
+            const result = await Comments.updateMany({
+                uid: obj.id
+            }, {
+                isRead: '1'
+            })
+            if (result.ok === 1) {
+                ctx.body = {
+                    code: 200,
+                }
+            }
+        }
+
+    }
+
+
 
 
 

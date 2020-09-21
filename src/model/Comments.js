@@ -92,6 +92,59 @@ CommentsSchema.statics = {
             tid: id
         }).countDocuments()
     },
+    getCommetsPublic: function (id, page, limit) {
+        return this.find({
+                cuid: id
+            })
+            .populate({
+                path: 'tid',
+                select: '_id title'
+            })
+            .skip(page * limit)
+            .limit(limit)
+            .sort({
+                created: -1
+            })
+    },
+    getMsgList: function (id, page, limit) {
+        return this.find({
+                uid: id,
+                cuid: {
+                    $ne: id // 隔离掉自己评论自己
+                },
+                isRead: {
+                    $eq: '0'
+                }, // 未读状态
+                status: {
+                    $eq: '1'
+                } // 是否显示
+            })
+            .populate({ // 替换字段信息
+                path: 'tid',
+                select: '_id title content'
+            })
+            .populate({
+                path: 'uid',
+                select: '_id name'
+            })
+            .populate({
+                path: 'cuid',
+                select: '_id name'
+            })
+            .skip(limit * page)
+            .limit(limit)
+            .sort({
+                created: -1
+            })
+    },
+    getTotal: function (id) {
+        return this.find({
+            uid: id,
+            isRead: '0',
+            status: '1'
+        }).countDocuments()
+    },
+
 }
 
 const Comments = mongoose.model('comments', CommentsSchema)

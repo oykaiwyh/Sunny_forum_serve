@@ -28,14 +28,14 @@ router.get('/post', contentController.getPostByUid)
 // 删除发贴记录
 router.get('/deletePost', contentController.deletePostByUid)
 
-// // 获取历史消息
-// router.get('/getmsg', userController.getMsg)
+// 获取历史消息
+router.get('/getmsg', userController.getMsg)
 
 // // 获取点赞记录
 // router.get('/getHands', userController.getHands)
 
-// // 设置消息状态
-// router.get('/setmsg', userController.setMsg)
+// 设置消息状态
+router.get('/setmsg', userController.setMsg)
 
 // // 保存错误日志
 // router.post('/addError', errorController.addError)

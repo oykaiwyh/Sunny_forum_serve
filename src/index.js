@@ -10,8 +10,14 @@ import compose from 'koa-compose'
 import compress from 'koa-compress'
 import Jwt from 'koa-jwt'
 import config from './config/index'
+import WebScoketServe from './config/WebSocket'
 import ErrorHandle from './common/ErrorHandle'
 const app = new koa()
+
+// 实例化websocket
+const ws = new WebScoketServe()
+ws.init()
+global.ws = ws
 
 const isDevMode = process.env.NODE_ENV === 'production' ? false : true
 
