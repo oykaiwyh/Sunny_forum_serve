@@ -218,22 +218,24 @@ class ContentController {
             })
 
             if (post.uid === obj._id && post.isEnd === '0') {
-                const result = await Post.updateOne({
-                    _id: body.tid
-                }, body)
-                if (result.ok === 1) {
-                    ctx.body = {
-                        code: 200,
-                        data: result,
-                        msg: '更新帖子成功'
-                    }
-                } else {
-                    ctx.body = {
-                        code: 500,
-                        data: result,
-                        msg: '编辑帖子，更新失败'
-                    }
-                }
+                await ContentController.prototype.updatePost(ctx)
+
+                // const result = await Post.updateOne({
+                //     _id: body.tid
+                // }, body)
+                // if (result.ok === 1) {
+                //     ctx.body = {
+                //         code: 200,
+                //         data: result,
+                //         msg: '更新帖子成功'
+                //     }
+                // } else {
+                //     ctx.body = {
+                //         code: 500,
+                //         data: result,
+                //         msg: '编辑帖子，更新失败'
+                //     }
+                // }
             } else {
 
                 ctx.body = {
@@ -332,10 +334,33 @@ class ContentController {
         } else {
             ctx.body = {
                 code: 500,
-                msg: '查询列表失败'
+                msg: '无发表贴'
             }
         }
 
+    }
+    // 获取用户发贴记录
+    async getPostPublic(ctx) {
+        const params = ctx.query
+        const result = await Post.getListByUid(
+            params.uid,
+            params.page,
+            params.limit ? parseInt(params.limit) : 10
+        )
+        const total = await Post.countByUid(params.uid)
+        if (result.length > 0) {
+            ctx.body = {
+                code: 200,
+                data: result,
+                total,
+                msg: '查询列表成功'
+            }
+        } else {
+            ctx.body = {
+                code: 500,
+                msg: '查询列表失败'
+            }
+        }
     }
 
     // 删除贴子
@@ -348,21 +373,27 @@ class ContentController {
             _id: params.tid
         })
         if (post.id === params.tid && post.isEnd === '0') {
-            const result = await Post.deleteOne({
-                _id: params.tid
-            })
-            if (result.ok === 1) {
-                ctx.body = {
-                    code: 200,
-                    data: result,
-                    msg: '删除贴子成功'
-                }
-            } else {
-                ctx.body = {
-                    code: 500,
-                    msg: '删除贴子失败'
-                }
-            }
+            // 不能直接使用this,因为此时导出的是一个new ContentController()的实例,this是拿不到方法的
+            // console.log(this);
+            // await this.deletePost(ctx)
+
+            await ContentController.prototype.deletePost(ctx)
+
+            // const result = await Post.deleteOne({
+            //     _id: params.tid
+            // })
+            // if (result.ok === 1) {
+            //     ctx.body = {
+            //         code: 200,
+            //         data: result,
+            //         msg: '删除贴子成功'
+            //     }
+            // } else {
+            //     ctx.body = {
+            //         code: 500,
+            //         msg: '删除贴子失败'
+            //     }
+            // }
         } else {
             ctx.body = {
                 code: 401,
@@ -372,6 +403,111 @@ class ContentController {
 
 
 
+    }
+
+    // 后台管理---删除贴子
+    async deletePost(ctx) {
+        const params = ctx.query
+
+        const result = await Post.deleteOne({
+            _id: params.tid
+        })
+        if (result.ok === 1) {
+            ctx.body = {
+                code: 200,
+                data: result,
+                msg: '删除贴子成功'
+            }
+        } else {
+            ctx.body = {
+                code: 500,
+                msg: '删除贴子失败'
+            }
+        }
+    }
+
+    // 后台管理---更新贴子
+    async updatePost(ctx) {
+        const {
+            body
+        } = ctx.request
+
+        const result = await Post.updateOne({
+            _id: body._id
+        }, body)
+        if (result.ok === 1) {
+            ctx.body = {
+                code: 200,
+                data: result,
+                msg: '更新帖子成功'
+            }
+        } else {
+            ctx.body = {
+                code: 500,
+                data: result,
+                msg: '编辑帖子，更新失败'
+            }
+        }
+    }
+
+    // 后台---添加标签
+    async addTag(ctx) {
+        const {
+            body
+        } = ctx.request
+        const tag = new PostTags(body)
+        await tag.save()
+        ctx.body = {
+            code: 200,
+            msg: '标签保存成功'
+        }
+    }
+
+    // 后台---添加标签
+    async getTags(ctx) {
+        const params = ctx.query
+        const page = params.page ? parseInt(params.page) : 0
+        const limit = params.limit ? parseInt(params.limit) : 10
+        const result = await PostTags.getList({}, page, limit)
+        const total = await PostTags.countList({})
+        ctx.body = {
+            code: 200,
+            data: result,
+            total,
+            msg: '查询tags成功！'
+        }
+    }
+
+    // 后台---删除标签
+    async removeTag(ctx) {
+        const params = ctx.query
+        const result = await PostTags.deleteOne({
+            id: params.ptid
+        })
+
+        ctx.body = {
+            code: 200,
+            data: result,
+            msg: '删除成功'
+        }
+    }
+
+    // 后台---更新标签
+    async updateTag(ctx) {
+        const {
+            body
+        } = ctx.request
+        const result = await PostTags.updateOne({
+                _id: body._id
+            },
+            body
+        )
+
+        ctx.body = {
+            code: 200,
+            data: result,
+            msg: '更新成功'
+        }
     }
 
     // // 更新帖子

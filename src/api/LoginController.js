@@ -59,10 +59,16 @@ class LoginController {
             let user = await User.findOne({
                 username: body.username
             })
+            if (!user) {
+                ctx.body = {
+                    code: 404,
+                    msg: '用户不存在'
+                }
+            }
             // // 静态方法去过滤
             // let findstatic = await User.findByName(body.username)
             let userObj = user.toJSON() //mongoose提供方法只取数据
-            const arr = ['password', 'username', 'roles']
+            const arr = ['password', 'username']
             arr.map(item => {
                 delete userObj[item]
             })
@@ -79,7 +85,7 @@ class LoginController {
                 })
                 //加入签到属性
                 const signRecord = await SignRecord.findByUid(userObj._id)
-                console.log(signRecord);
+                // console.log(signRecord);
 
                 if (signRecord !== null) {
                     if (moment(signRecord.created).format('YYYY-MM-DD') ===

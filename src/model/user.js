@@ -107,6 +107,57 @@ UserSchema.statics = {
             password: 0 // 0 代表过滤掉该属性返回
         })
     },
+    getList: function (options, sort, page, limit) {
+        // 1. datepicker -> item: string, search -> array  startitme,endtime
+        // 2. radio -> key-value $in
+        // 3. select -> key-array $in
+
+        let query = {}
+
+        if (typeof options.search === 'string' && options.search.trim() !== '') {
+
+            if (options.item === 'created') {
+                const start = options.search[0]
+                const end = options.search[1]
+
+                query = {
+                    created: {
+                        $gte: new Date(start),
+                        $lt: new Date(end)
+                    }
+                }
+            } else if (options.item === 'roles') {
+                query = {
+                    roles: {
+                        $in: options.search
+                    }
+                }
+
+            } else if (['name', 'username'].includes(options.item)) {
+                // 模糊匹配
+                query[options.item] = {
+                    $regex: new RegExp(options.search)
+                }
+                // =》 { name: { $regex: /admin/ } } => mysql like %admin%
+
+            } else {
+                // radio
+                query[options.item] = options.search
+            }
+        }
+        return this.find(query, {
+                password: 0,
+                mobile: 0
+            })
+            .sort({
+                [sort]: -1
+            })
+            .skip(page * limit)
+            .limit(limit)
+    },
+    countList: function (options) {
+        return this.find(options).countDocuments()
+    },
 }
 
 

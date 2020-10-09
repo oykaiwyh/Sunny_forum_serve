@@ -36,3 +36,13 @@ path.parse(dire).dir
 ### Mongodb 对返回的查询数据结构进行变更 data.toJSON()
 
 
+
+### 对于前端get请求传递的是一个对象options{...}时，后端接收到的却不是一个对象
+params:
+    option[item]: roles
+    option[search][0]: admin
+    option[search][1]: super_admin
+
+1、改为post请求直接接收data数据
+2、使用qs库，转换请求数据 qs.parse(params)
+

@@ -1,8 +1,6 @@
 import redis from 'redis'
 import config from './index'
-import {
-    rootCertificates
-} from 'tls';
+
 
 const options = {
     // host: '192.168.10.133',

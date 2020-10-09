@@ -12,6 +12,10 @@ import Jwt from 'koa-jwt'
 import config from './config/index'
 import WebScoketServe from './config/WebSocket'
 import ErrorHandle from './common/ErrorHandle'
+import Auth from '@/common/Auth'
+import {
+    run
+} from '@/common/init'
 const app = new koa()
 
 // 实例化websocket
@@ -54,7 +58,8 @@ const middleware = compose([
     }),
     helmet(),
     ErrorHandle,
-    jwt
+    jwt,
+    Auth
 ])
 
 if (!isDevMode) {
@@ -64,4 +69,6 @@ if (!isDevMode) {
 app.use(middleware)
 app.use(router())
 
-app.listen(3000)
+app.listen(3000, () => {
+    run()
+})

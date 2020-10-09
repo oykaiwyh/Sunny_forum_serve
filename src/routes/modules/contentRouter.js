@@ -14,5 +14,10 @@ router.post('/add', contentController.addPost)
 //更新帖子
 router.post('/update', contentController.updatePost)
 
+// 后台管理---删除贴子
+router.get('/delete', contentController.deletePost)
+// 后台管理---更新贴子
+router.post('/update-id', contentController.updatePost)
+
 
 export default router

@@ -84,11 +84,101 @@ const rename = (obj, key, newkey) => {
     return obj
 }
 
+/**
+ * @description 菜单排序
+ * @param {*} tree 
+ */
+const sortMenus = (tree) => {
+    tree = sortObj(tree, 'sort')
+    if (tree.children && tree.children.length > 0) {
+        tree.children = sortMenus(tree.children, 'sort')
+    }
+    if (tree.operations && tree.operations.length > 0) {
+        tree.operations = sortMenus(tree.operations, 'sort')
+    }
+    return tree
+}
 
+/**
+ * @description 封装路由结构信息
+ * @param {Array} tree 菜单数据
+ * @param {Array} rights 角色信息
+ * @param {Boolean} flag  是否为超级管理员
+ */
+// 排序
+const sortObj = (arr, property) => {
+    return arr.sort((m, n) => m[property] - n[property])
+}
+const getMenuData = (tree, rights, flag) => {
+    const arr = []
+    for (let i = 0; i < tree.length; i++) {
+        const item = tree[i]
+        // _id 包含在menus中
+        // 结构进行改造，删除opertaions
+        if (rights.includes(item._id + '') || flag) {
+            if (item.type === 'menu') {
+                arr.push({
+                    _id: item._id,
+                    path: item.path,
+                    meta: {
+                        title: item.title,
+                        hideInBread: item.hideInBread,
+                        hideInMenu: item.hideInMenu,
+                        notCache: item.notCache,
+                        icon: item.icon
+                    },
+                    component: item.component,
+                    children: getMenuData(item.children, rights)
+                })
+            } else if (item.type === 'link') {
+                arr.push({
+                    _id: item._id,
+                    path: item.path,
+                    meta: {
+                        title: item.title,
+                        icon: item.icon,
+                        href: item.link
+                    }
+                })
+            }
+        }
+    }
+
+    return sortObj(arr, 'sort')
+}
+
+/**
+ * @description 菜单资源中资源权限
+ * @param {*} arr 
+ */
+const flatten = (arr) => {
+    while (arr.some((item) => Array.isArray(item))) {
+        arr = [].concat(...arr)
+    }
+    return arr
+}
+const getRights = (tree, menus) => {
+    let arr = []
+    for (let item of tree) {
+        if (item.operations && item.operations.length > 0) {
+            for (let op of item.operations) {
+                if (menus.includes(op._id + '')) {
+                    arr.push(op.path)
+                }
+            }
+        } else if (item.children && item.children.length > 0) {
+            arr.push(getRights(item.children, menus))
+        }
+    }
+    return flatten(arr)
+}
 
 export {
     checkCode,
     getJWTpayload,
     dirExists,
-    rename
+    rename,
+    sortMenus,
+    getMenuData,
+    getRights
 }
