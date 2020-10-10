@@ -14,7 +14,7 @@ const JWT_SECRET = 'Sunny-forum-secret'
 const baseUrl = process.env.NODE_ENV === 'production' ? 'http://www.sunny_forum.com' : 'http://localhost:8080'
 const uploadPath = process.env.NODE_ENV === 'production' ? '/app/public' : path.join(path.resolve(__dirname), '../../public')
 
-const SuperAdmin = ['1641250803@qq.com']
+const SuperAdmin = ['1641250803@qq.com', 'w@w.com']
 
 const publicPath = [/^\/public/, /^\/login/, /^\/content/, /^\/user/, /^\/comments/]
 

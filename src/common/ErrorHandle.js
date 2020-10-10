@@ -1,5 +1,13 @@
+import log4js from '@/config/log4'
+import ErrorRecord from '@/model/ErrorRecord'
+
+
+const logger = log4js.getLogger('error')
 export default (ctx, next) => {
     return next().catch((err) => {
+        // 自定义的日志记录信息
+        logger.error(`${ctx.url} ${ctx.method} ${ctx.status} ${err.stack} `)
+
         if (401 == err.status) {
             ctx.status = 401;
             ctx.body = {

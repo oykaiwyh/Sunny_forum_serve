@@ -46,7 +46,11 @@ npm install -s uuid
 <!-- 文件上传  递归执行创建目录-->
 npm install -s make-dir
 
+<!-- 日志 只能对正常的请求进行持久化，不会去对错误的请求做记录-->
+npm install -s koa-logger
 
+<!-- 日志 log4  使用koa封装的koa-log4-->
+npm install -s koa-log4@2
 
 
 

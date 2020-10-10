@@ -1,0 +1,7 @@
+[2020-10-10T16:31:01.514] [ERROR] error - /ge1 GET 404 UnauthorizedError: Authentication Error
+    at Object.throw (F:\大前端\day_04\github\server\api\node_modules\koa\lib\context.js:97:11)
+    at jwt (F:\大前端\day_04\github\server\api\node_modules\koa-jwt\lib\index.js:23:22)
+    at F:\大前端\day_04\github\server\api\node_modules\koa-unless\index.js:29:12
+    at dispatch (F:\大前端\day_04\github\server\api\node_modules\koa-compose\index.js:42:32)
+    at __webpack_exports__.default (webpack-internal:///./src/common/ErrorHandle.js:6:10)
+    at dispatch (F:\大前端\day_04\github\server\api\node_modules\koa-compose\index.js:42:32) 

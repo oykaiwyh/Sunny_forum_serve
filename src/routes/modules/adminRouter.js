@@ -2,7 +2,7 @@ import Router from 'koa-router'
 import contentController from '@/api/ContentController'
 import userController from '@/api/UserController'
 import adminController from '@/api/AdminController'
-// import errorController from '@/api/ErrorController'
+import errorController from '@/api/ErrorController'
 
 const router = new Router()
 
@@ -89,14 +89,14 @@ router.get('/getRoutes', adminController.getRoutes)
 // 后台管理--获取用户 -> 角色 -> 动态菜单信息 ->资源权限
 // router.get('/getOperations', adminController.getOperations)
 
-// // 获取统计数据
-// router.get('/getstat', adminController.getStats)
+// 获取统计数据
+router.get('/getstat', adminController.getStats)
 
-// // 获取错误日志
-// router.get('/getError', errorController.getErrorList)
+// 获取错误日志
+router.get('/getError', errorController.getErrorList)
 
-// // 删除错误日志
-// router.post('/deleteError', errorController.deleteError)
+// 删除错误日志
+router.post('/deleteError', errorController.deleteError)
 
 
 export default router

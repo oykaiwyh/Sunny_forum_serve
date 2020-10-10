@@ -1,0 +1,7 @@
+[2020-10-10T16:29:30.417] [INFO] http - ::1 - - "GET /public/info HTTP/1.1" 200 334 "http://localhost:8080/home" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+[2020-10-10T16:29:31.571] [INFO] http - ::1 - - "GET /admin/getstat HTTP/1.1" 200 206 "http://localhost:8080/home" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+[2020-10-10T16:30:31.607] [INFO] http - ::1 - - "GET /public/info HTTP/1.1" 200 334 "http://localhost:8080/home" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+[2020-10-10T16:30:33.089] [INFO] http - ::1 - - "GET /admin/getstat HTTP/1.1" 200 206 "http://localhost:8080/home" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+[2020-10-10T16:31:41.819] [INFO] http - ::1 - - "GET /public/info HTTP/1.1" 200 334 "http://localhost:8080/home" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+[2020-10-10T16:31:43.878] [INFO] http - ::1 - - "GET /admin/getstat HTTP/1.1" 200 206 "http://localhost:8080/home" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"
+[2020-10-10T16:33:01.021] [ERROR] http - ::1 - - "GET /ge1 HTTP/1.1" 404 - "" "PostmanRuntime/7.26.5"

@@ -8,10 +8,9 @@ import {
 import {
     getValue
 } from '@/config/RedisConfig'
-import {
-    publicPath
-} from '@/config'
+import config from '@/config/index'
 import adminController from '@/api/AdminController'
+
 
 export default async (ctx, next) => {
     const headers = ctx.header.authorization
@@ -40,7 +39,7 @@ export default async (ctx, next) => {
     }
     // 2. 根据用户的roles -> menus -> operations
     const operations = await adminController.getOperations(ctx)
-
+    console.log(operations);
     // 3. 判断用户的请求路径是否在operations里面，如果在放行，否则禁止访问
 
     if (operations.includes(ctx.url)) {

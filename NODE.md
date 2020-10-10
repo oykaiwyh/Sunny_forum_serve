@@ -46,3 +46,15 @@ params:
 1、改为post请求直接接收data数据
 2、使用qs库，转换请求数据 qs.parse(params)
 
+
+get ctx.query
+post ctx.request.body
+
+// 将数组转换为对象
+monthData = monthData.reduce((obj, item) => {
+    return {
+        ...obj,
+        [item._id]: item.count
+    }
+}, {})
+

@@ -16,6 +16,14 @@ import Auth from '@/common/Auth'
 import {
     run
 } from '@/common/init'
+
+// import logger from 'koa-logger'
+
+import log4js from '@/config/log4'
+import Logger from '@/common/Logger'
+
+
+
 const app = new koa()
 
 // 实例化websocket
@@ -38,6 +46,7 @@ const jwt = Jwt({
  * 使用koa-compose 集成中间件
  */
 const middleware = compose([
+    Logger,
     koaBody({
         multipart: true,
         // encoding: "utf-8",
@@ -59,7 +68,14 @@ const middleware = compose([
     helmet(),
     ErrorHandle,
     jwt,
-    Auth
+    Auth,
+    // logger(),只有记录请求正确的url信息，错误的不能去搜集 简洁
+    // 对于logger去写入文件，是会去影响性能的
+    isDevMode ? log4js.koaLogger(log4js.getLogger('http'), {
+        level: 'auto'
+    }) : log4js.koaLogger(log4js.getLogger('access'), {
+        level: 'auto'
+    }),
 ])
 
 if (!isDevMode) {
@@ -70,5 +86,6 @@ app.use(middleware)
 app.use(router())
 
 app.listen(3000, () => {
+    // console.log('app is running 3000');
     run()
 })
